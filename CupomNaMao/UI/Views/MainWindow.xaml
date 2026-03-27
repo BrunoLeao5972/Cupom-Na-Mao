@@ -1,0 +1,827 @@
+<Window x:Class="CupomNaMao.UI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:CupomNaMao.UI.Converters"
+        Title="Cupom Na Mão — DANFE NFC-e"
+        Height="680" Width="1050"
+        MinHeight="560" MinWidth="860"
+        WindowStartupLocation="CenterScreen"
+        Icon="pack://application:,,,/Resources/app.ico"
+        Background="{DynamicResource BackgroundBrush}"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver">
+
+    <Window.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolVis"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InvBoolVis"/>
+        <conv:StringToVisibilityConverter x:Key="StrVis"/>
+        <conv:CnpjFormatConverter x:Key="CnpjFmt"/>
+        <conv:CurrencyConverter x:Key="CurrFmt"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Sidebar -->
+            <ColumnDefinition Width="200"/>
+            <!-- Conteúdo principal -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SIDEBAR
+             ═══════════════════════════════════════════════════════════════════ -->
+        <Border Grid.Column="0"
+                Background="{DynamicResource SidebarBrush}">
+            <DockPanel>
+                <!-- Logo / Título -->
+                <Border DockPanel.Dock="Top"
+                        Padding="16,20,16,16"
+                        BorderBrush="#1976D2"
+                        BorderThickness="0,0,0,1">
+                    <StackPanel>
+                        <!-- Ícone vetorial — cupom / nota fiscal -->
+                        <Viewbox Width="40" Height="40"
+                                 HorizontalAlignment="Center"
+                                 Margin="0,0,0,4">
+                            <Canvas Width="24" Height="23">
+                                <!-- Corpo do papel com borda serrilhada (picote) na base -->
+                                <Path Fill="White" Opacity="0.93"
+                                      Data="M4,0 H20 V17
+                                            Q18,19.5 16,17
+                                            Q14,19.5 12,17
+                                            Q10,19.5  8,17
+                                            Q 6,19.5  4,17 Z"/>
+                                <!-- Linha de título -->
+                                <Rectangle Canvas.Left="5.5" Canvas.Top="2.5"
+                                           Width="13" Height="1.5"
+                                           Fill="#1565C0" Opacity="0.72"
+                                           RadiusX="0.5" RadiusY="0.5"/>
+                                <!-- Separador superior -->
+                                <Rectangle Canvas.Left="5.5" Canvas.Top="5.5"
+                                           Width="13" Height="0.7"
+                                           Fill="#90CAF9" Opacity="0.55"
+                                           RadiusX="0.3" RadiusY="0.3"/>
+                                <!-- Linhas de itens -->
+                                <Rectangle Canvas.Left="5.5" Canvas.Top="7.5"
+                                           Width="11" Height="0.8"
+                                           Fill="#90CAF9" Opacity="0.50"
+                                           RadiusX="0.3" RadiusY="0.3"/>
+                                <Rectangle Canvas.Left="5.5" Canvas.Top="9.5"
+                                           Width="9"  Height="0.8"
+                                           Fill="#90CAF9" Opacity="0.50"
+                                           RadiusX="0.3" RadiusY="0.3"/>
+                                <Rectangle Canvas.Left="5.5" Canvas.Top="11.5"
+                                           Width="10" Height="0.8"
+                                           Fill="#90CAF9" Opacity="0.50"
+                                           RadiusX="0.3" RadiusY="0.3"/>
+                                <!-- Separador do total -->
+                                <Rectangle Canvas.Left="5.5" Canvas.Top="13.5"
+                                           Width="13" Height="0.6"
+                                           Fill="#42A5F5" Opacity="0.60"/>
+                                <!-- Linha do total (destaque) -->
+                                <Rectangle Canvas.Left="5.5" Canvas.Top="15"
+                                           Width="13" Height="1.3"
+                                           Fill="#1565C0" Opacity="0.70"
+                                           RadiusX="0.4" RadiusY="0.4"/>
+                            </Canvas>
+                        </Viewbox>
+                        <TextBlock Text="Cupom Na Mão"
+                                   Foreground="White"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="DANFE NFC-e"
+                                   Foreground="#90CAF9"
+                                   FontSize="11"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Ações principais -->
+                <StackPanel DockPanel.Dock="Top" Margin="8,12,8,0">
+                    <TextBlock Text="AÇÕES"
+                               Foreground="#90CAF9"
+                               FontSize="10"
+                               FontWeight="Bold"
+                               Margin="10,0,0,6"
+                               />
+
+                    <Button x:Name="BtnSelecionarXml"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnSelecionarXml_Click"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📂" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Selecionar XML"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="BtnGerarPdf"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnGerarPdf_Click"
+                            IsEnabled="{Binding NfceCarregada}"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📄" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Gerar PDF"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="BtnVisualizarPdf"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnVisualizarPdf_Click"
+                            IsEnabled="{Binding PdfGerado}"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👁️" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Visualizar PDF"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="BtnSalvarPdf"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnSalvarPdf_Click"
+                            IsEnabled="{Binding NfceCarregada}"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="💾" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Salvar PDF"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="BtnImprimir"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnImprimir_Click"
+                            IsEnabled="{Binding PdfGerado}"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🖨️" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Imprimir"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="BtnCopiarChave"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnCopiarChave_Click"
+                            IsEnabled="{Binding NfceCarregada}"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📋" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Copiar Chave"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="BtnConsultarSefaz"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnConsultarSefaz_Click"
+                            IsEnabled="{Binding NfceCarregada}"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🌐" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Consultar Chave na Sefaz"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Lote -->
+                <StackPanel DockPanel.Dock="Top" Margin="8,16,8,0">
+                    <TextBlock Text="LOTE"
+                               Foreground="#90CAF9"
+                               FontSize="10"
+                               FontWeight="Bold"
+                               Margin="10,0,0,6"/>
+
+                    <Button x:Name="BtnProcessarLote"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnProcessarLote_Click"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚡" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Processar em Lote"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="BtnGerarZip"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnGerarZip_Click"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🗜️" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Gerar ZIP"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Configurações -->
+                <StackPanel DockPanel.Dock="Bottom" Margin="8,0,8,12">
+                    <Button x:Name="BtnSobre"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnSobre_Click"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="ℹ️" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Sobre"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="BtnConfiguracoes"
+                            Style="{DynamicResource BotaoAcao}"
+                            Click="BtnConfiguracoes_Click"
+                            Margin="0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚙️" FontSize="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Configurações"/>
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Text="v1.0.0"
+                               Foreground="#5C8BC8"
+                               FontSize="10"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             ÁREA PRINCIPAL
+             ═══════════════════════════════════════════════════════════════════ -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <!-- Barra de status -->
+                <RowDefinition Height="Auto"/>
+                <!-- Conteúdo -->
+                <RowDefinition Height="*"/>
+                <!-- Status bar inferior -->
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Barra superior -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="16,10">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left"
+                               Text="{Binding TituloArquivo}"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+
+                    <!-- Indicador de ambiente -->
+                    <Border DockPanel.Dock="Left"
+                            Margin="12,0,0,0"
+                            Padding="6,2"
+                            CornerRadius="10"
+                            Visibility="{Binding AmbienteHomologacao, Converter={StaticResource BoolVis}}">
+                        <Border.Background>
+                            <SolidColorBrush Color="#FFF3E0"/>
+                        </Border.Background>
+                        <TextBlock Text="HOMOLOGAÇÃO"
+                                   FontSize="9"
+                                   FontWeight="Bold"
+                                   Foreground="#E65100"/>
+                    </Border>
+
+                </DockPanel>
+            </Border>
+
+            <!-- Conteúdo principal (com scroll) -->
+            <Grid Grid.Row="1">
+                <!-- ── Estado: Sem arquivo carregado ── -->
+                <Grid Visibility="{Binding NfceCarregada, Converter={StaticResource InvBoolVis}}">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <!-- Zona de drop -->
+                        <Border x:Name="DropZone"
+                                Width="480" Height="260"
+                                Background="{DynamicResource DropZoneBrush}"
+                                BorderBrush="{DynamicResource DropZoneBorderBrush}"
+                                BorderThickness="2"
+                                CornerRadius="12"
+                                AllowDrop="True">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ArrastandoArquivo}" Value="True">
+                                            <Setter Property="BorderBrush" Value="#1565C0"/>
+                                            <Setter Property="Background" Value="#BBDEFB"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="📂"
+                                           FontSize="52"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,12"/>
+                                <TextBlock Text="Arraste arquivos XML aqui"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="ou"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,8"/>
+                                <Button Style="{DynamicResource BotaoPrimario}"
+                                        Click="BtnSelecionarXml_Click"
+                                        HorizontalAlignment="Center">
+                                    Selecionar XML(s)
+                                </Button>
+                                <TextBlock Text="Suporta múltiplos arquivos NFC-e (.xml)"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,12,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Histórico recente -->
+                        <Border Margin="0,20,0,0"
+                                Width="480"
+                                Visibility="{Binding TemHistorico, Converter={StaticResource BoolVis}}">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,8">
+                                    <TextBlock DockPanel.Dock="Left"
+                                               Text="Recentes"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    <Button DockPanel.Dock="Right"
+                                            Content="Limpar"
+                                            Click="BtnLimparHistorico_Click"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Foreground="{DynamicResource TextSecondaryBrush}"
+                                            FontSize="11"
+                                            Cursor="Hand"
+                                            Padding="0"/>
+                                </DockPanel>
+                                <ItemsControl x:Name="ListaHistorico"
+                                              ItemsSource="{Binding Historico}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{DynamicResource ItemHistorico}"
+                                                    MouseLeftButtonDown="HistoricoItem_Click"
+                                                    Tag="{Binding CaminhoArquivo}">
+                                                <Border.InputBindings>
+                                                    <MouseBinding MouseAction="LeftClick"
+                                                                  Command="{Binding DataContext.AbrirHistoricoCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                  CommandParameter="{Binding CaminhoArquivo}"/>
+                                                </Border.InputBindings>
+                                                <DockPanel>
+                                                    <TextBlock DockPanel.Dock="Left"
+                                                               Text="📄"
+                                                               FontSize="16"
+                                                               Margin="0,0,8,0"
+                                                               VerticalAlignment="Center"/>
+                                                    <StackPanel DockPanel.Dock="Right"
+                                                                HorizontalAlignment="Right"
+                                                                VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding ValorTotal, Converter={StaticResource CurrFmt}}"
+                                                                   FontSize="12"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource PrimaryBrush}"
+                                                                   HorizontalAlignment="Right"/>
+                                                        <TextBlock Text="{Binding DataEmissao, StringFormat={}{0:dd/MM/yyyy}}"
+                                                                   FontSize="10"
+                                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                                   HorizontalAlignment="Right"/>
+                                                    </StackPanel>
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding NomeEmitente}"
+                                                                   FontSize="12"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   MaxWidth="220"/>
+                                                        <TextBlock Text="{Binding NomeArquivo}"
+                                                                   FontSize="10"
+                                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   MaxWidth="220"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ── Estado: NFC-e carregada ── -->
+                <Grid Visibility="{Binding NfceCarregada, Converter={StaticResource BoolVis}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="260"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Painel central: resumo + produtos -->
+                    <ScrollViewer Grid.Column="0"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="16,16,8,16">
+                        <StackPanel>
+                            <!-- Card resumo -->
+                            <Border Background="{DynamicResource CardBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding NfceAtual.NomeEmitente}"
+                                                   FontSize="17"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding NfceAtual.CnpjEmitente, Converter={StaticResource CnpjFmt}}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Margin="0,2,0,0"/>
+                                        <TextBlock Text="{Binding NfceAtual.EnderecoEmitente}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Margin="0,1,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                        <TextBlock Text="{Binding NfceAtual.TotalNota, Converter={StaticResource CurrFmt}}"
+                                                   FontSize="22"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource PrimaryBrush}"
+                                                   HorizontalAlignment="Right"/>
+                                        <TextBlock Text="{Binding NfceAtual.DataEmissao, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   HorizontalAlignment="Right"/>
+                                        <TextBlock Text="{Binding NfceAtual.Ambiente}"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   HorizontalAlignment="Right"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Metadados NFC-e -->
+                            <Border Background="{DynamicResource CardBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Número / Série"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <TextBlock FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}">
+                                            <Run Text="{Binding NfceAtual.NumeroNota, Mode=OneWay}"/>
+                                            <Run Text=" / "/>
+                                            <Run Text="{Binding NfceAtual.SerieNota, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Itens"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding NfceAtual.Produtos.Count}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Protocolo"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding NfceAtual.NumeroProtocolo}"
+                                                   FontSize="11" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Chave de acesso -->
+                            <Border Background="{DynamicResource CardBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12,10"
+                                    Margin="0,0,0,12">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Left"
+                                               Text="Chave: "
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right"
+                                            Content="📋 Copiar"
+                                            Click="BtnCopiarChave_Click"
+                                            Style="{DynamicResource BotaoSecundario}"
+                                            FontSize="11"
+                                            Padding="8,4"
+                                            Margin="8,0,0,0"/>
+                                    <TextBlock Text="{Binding NfceAtual.ChaveAcessoFormatada}"
+                                               FontSize="10"
+                                               FontFamily="Consolas"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               VerticalAlignment="Center"
+                                               TextWrapping="Wrap"/>
+                                </DockPanel>
+                            </Border>
+
+                            <!-- Tabela de produtos -->
+                            <Border Background="{DynamicResource CardBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="0"
+                                    Margin="0,0,0,12">
+                                <StackPanel>
+                                    <Border Background="{DynamicResource DropZoneBrush}"
+                                            CornerRadius="8,8,0,0"
+                                            Padding="12,8">
+                                        <TextBlock Text="PRODUTOS"
+                                                   FontSize="11"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    </Border>
+                                    <DataGrid x:Name="GridProdutos"
+                                              ItemsSource="{Binding NfceAtual.Produtos}"
+                                              AutoGenerateColumns="False"
+                                              IsReadOnly="True"
+                                              GridLinesVisibility="Horizontal"
+                                              HeadersVisibility="Column"
+                                              BorderThickness="0"
+                                              Background="Transparent"
+                                              RowBackground="Transparent"
+                                              AlternatingRowBackground="{DynamicResource DropZoneBrush}"
+                                              FontSize="12"
+                                              CanUserResizeRows="False"
+                                              SelectionMode="Single">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="#" Binding="{Binding NumeroItem}" Width="35"/>
+                                            <DataGridTextColumn Header="Código" Binding="{Binding Codigo}" Width="70"/>
+                                            <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*"/>
+                                            <DataGridTextColumn Header="Un." Binding="{Binding Unidade}" Width="40"/>
+                                            <DataGridTextColumn Header="Qtd" Binding="{Binding Quantidade, StringFormat=N3}" Width="60"/>
+                                            <DataGridTextColumn Header="Vl. Unit." Binding="{Binding ValorUnitario, StringFormat=N2}" Width="75"/>
+                                            <DataGridTextColumn Header="Total" Binding="{Binding ValorTotal, StringFormat=N2}" Width="75"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Totais e pagamentos -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Totais -->
+                                <Border Grid.Column="0"
+                                        Background="{DynamicResource CardBrush}"
+                                        BorderBrush="{DynamicResource CardBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="14">
+                                    <StackPanel>
+                                        <TextBlock Text="TOTAIS"
+                                                   FontSize="11"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Margin="0,0,0,8"/>
+                                        <DockPanel Margin="0,2">
+                                            <TextBlock DockPanel.Dock="Left" Text="Produtos:"
+                                                       FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            <TextBlock DockPanel.Dock="Right"
+                                                       Text="{Binding NfceAtual.TotalProdutos, Converter={StaticResource CurrFmt}}"
+                                                       FontSize="12" HorizontalAlignment="Right"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        </DockPanel>
+                                        <DockPanel Margin="0,2"
+                                                   Visibility="{Binding NfceAtual.TotalDesconto, Converter={StaticResource StrVis}}">
+                                            <TextBlock DockPanel.Dock="Left" Text="Desconto:"
+                                                       FontSize="12" Foreground="{DynamicResource ErrorBrush}"/>
+                                            <TextBlock DockPanel.Dock="Right"
+                                                       Text="{Binding NfceAtual.TotalDesconto, Converter={StaticResource CurrFmt}}"
+                                                       FontSize="12" HorizontalAlignment="Right"
+                                                       Foreground="{DynamicResource ErrorBrush}"/>
+                                        </DockPanel>
+                                        <Separator Margin="0,6"/>
+                                        <DockPanel>
+                                            <TextBlock DockPanel.Dock="Left" Text="TOTAL:"
+                                                       FontSize="14" FontWeight="Bold"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                            <TextBlock DockPanel.Dock="Right"
+                                                       Text="{Binding NfceAtual.TotalNota, Converter={StaticResource CurrFmt}}"
+                                                       FontSize="14" FontWeight="Bold"
+                                                       HorizontalAlignment="Right"
+                                                       Foreground="{DynamicResource PrimaryBrush}"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Pagamentos -->
+                                <Border Grid.Column="2"
+                                        Background="{DynamicResource CardBrush}"
+                                        BorderBrush="{DynamicResource CardBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="14">
+                                    <StackPanel>
+                                        <TextBlock Text="PAGAMENTOS"
+                                                   FontSize="11"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Margin="0,0,0,8"/>
+                                        <ItemsControl ItemsSource="{Binding NfceAtual.Pagamentos}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <DockPanel Margin="0,2">
+                                                        <TextBlock DockPanel.Dock="Left"
+                                                                   Text="{Binding TipoPagamentoDescricao}"
+                                                                   FontSize="12"
+                                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                        <TextBlock DockPanel.Dock="Right"
+                                                                   Text="{Binding Valor, Converter={StaticResource CurrFmt}}"
+                                                                   FontSize="12"
+                                                                   HorizontalAlignment="Right"
+                                                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    </DockPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                        <Separator Margin="0,6"/>
+                                        <DockPanel>
+                                            <TextBlock DockPanel.Dock="Left" Text="Troco:"
+                                                       FontSize="12" Foreground="{DynamicResource SuccessBrush}"/>
+                                            <TextBlock DockPanel.Dock="Right"
+                                                       Text="{Binding NfceAtual.Troco, Converter={StaticResource CurrFmt}}"
+                                                       FontSize="12" FontWeight="SemiBold"
+                                                       HorizontalAlignment="Right"
+                                                       Foreground="{DynamicResource SuccessBrush}"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Informações adicionais -->
+                            <Border Background="{DynamicResource CardBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="14"
+                                    Margin="0,0,0,12"
+                                    Visibility="{Binding NfceAtual.InformacoesAdicionais, Converter={StaticResource StrVis}}">
+                                <StackPanel>
+                                    <TextBlock Text="INFORMAÇÕES ADICIONAIS"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               Margin="0,0,0,6"/>
+                                    <TextBlock Text="{Binding NfceAtual.InformacoesAdicionais}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Painel direito: ações rápidas + status PDF -->
+                    <Border Grid.Column="1"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1,0,0,0"
+                            Padding="14">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <TextBlock Text="AÇÕES RÁPIDAS"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,10"/>
+
+                                <Button Style="{DynamicResource BotaoPrimario}"
+                                        Click="BtnGerarPdf_Click"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="0,0,0,6">
+                                    📄  Gerar PDF
+                                </Button>
+
+                                <Button Style="{DynamicResource BotaoSecundario}"
+                                        Click="BtnVisualizarPdf_Click"
+                                        IsEnabled="{Binding PdfGerado}"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="0,0,0,6">
+                                    👁️  Visualizar PDF
+                                </Button>
+
+                                <Button Style="{DynamicResource BotaoSecundario}"
+                                        Click="BtnSalvarPdf_Click"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="0,0,0,6">
+                                    💾  Salvar PDF Como...
+                                </Button>
+
+                                <Button Style="{DynamicResource BotaoSecundario}"
+                                        Click="BtnImprimir_Click"
+                                        IsEnabled="{Binding PdfGerado}"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="0,0,0,6">
+                                    🖨️  Imprimir
+                                </Button>
+
+                                <Button Style="{DynamicResource BotaoSecundario}"
+                                        Click="BtnCopiarChave_Click"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="0,0,0,6">
+                                    📋  Copiar Chave
+                                </Button>
+
+                                <Button Style="{DynamicResource BotaoSecundario}"
+                                        Click="BtnConsultarSefaz_Click"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="0,0,0,16">
+                                    🌐  Consultar Chave na Sefaz
+                                </Button>
+
+                                <!-- Status do PDF gerado -->
+                                <Border Background="{DynamicResource DropZoneBrush}"
+                                        BorderBrush="{DynamicResource DropZoneBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="10"
+                                        Visibility="{Binding PdfGerado, Converter={StaticResource BoolVis}}">
+                                    <StackPanel>
+                                        <TextBlock Text="✅ PDF Gerado"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource SuccessBrush}"
+                                                   Margin="0,0,0,4"/>
+                                        <TextBlock Text="{Binding NomePdfGerado}"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Novo arquivo -->
+                                <Button Style="{DynamicResource BotaoSecundario}"
+                                        Click="BtnNovoArquivo_Click"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="0,12,0,0">
+                                    ↩️  Abrir Outro XML
+                                </Button>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- Barra de status inferior -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="16,6">
+                <DockPanel>
+                    <!-- Indicador de carregamento -->
+                    <StackPanel DockPanel.Dock="Right"
+                                Orientation="Horizontal"
+                                Visibility="{Binding Carregando, Converter={StaticResource BoolVis}}">
+                        <TextBlock Text="⏳ Processando..."
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="TxtStatus"
+                               Text="{Binding MensagemStatus}"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,146 @@
+<Window x:Class="CupomNaMao.UI.Views.SobreWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sobre — Cupom Na Mão"
+        Height="620" Width="680"
+        MinHeight="560" MinWidth="620"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanMinimize"
+        Background="{DynamicResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                CornerRadius="10"
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                Margin="0,0,0,16">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Left"
+                           Text="ℹ️"
+                           FontSize="30"
+                           VerticalAlignment="Center"
+                           Margin="0,0,12,0"/>
+                <StackPanel>
+                    <TextBlock Text="Cupom Na Mão"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="Informações institucionais, finalidade e termos de uso"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Nome da aplicação"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="Cupom Na Mão"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Finalidade"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="Aplicação desenvolvida com o objetivo de facilitar a visualização e o envio de cupons fiscais (XML/PDF) ao consumidor."
+                                   FontSize="13"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Desenvolvedor"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <TextBlock Text="Desenvolvido por Bruno Leão"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="Termos e aviso legal"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <Separator Margin="0,8,0,10"/>
+                        <TextBlock FontSize="13"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextPrimaryBrush}">
+                            <Run Text="Este software é de propriedade intelectual de seu desenvolvedor."/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="É proibida a revenda, redistribuição ou comercialização sem autorização prévia e formal."/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="O uso indevido, cópia não autorizada ou qualquer forma de exploração comercial sem permissão poderá resultar em sanções legais conforme a legislação vigente."/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="Ao utilizar este software, o usuário declara estar ciente e de acordo com estes termos e condições."/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <DockPanel Grid.Row="2" Margin="0,16,0,0">
+            <TextBlock DockPanel.Dock="Left"
+                       Text="Versão 1.0.0"
+                       FontSize="11"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       VerticalAlignment="Center"/>
+            <Button DockPanel.Dock="Right"
+                    Content="Fechar"
+                    Click="BtnFechar_Click"
+                    Padding="16,8"
+                    Background="{DynamicResource PrimaryBrush}"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Cursor="Hand"/>
+        </DockPanel>
+    </Grid>
+</Window>

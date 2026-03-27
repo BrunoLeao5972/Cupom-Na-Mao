@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>CupomNaMao</AssemblyName>
+    <RootNamespace>CupomNaMao</RootNamespace>
+    <Version>1.0.0</Version>
+    <Company>Suporte Técnico</Company>
+    <Product>Cupom Na Mão</Product>
+    <Description>Conversor de XML NFC-e para DANFE PDF — Ferramenta de Suporte Técnico</Description>
+    <Copyright>2025</Copyright>
+    <ApplicationIcon>Resources\app.ico</ApplicationIcon>
+    <Platforms>AnyCPU</Platforms>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <!-- Para publicação como executável único -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Geração de PDF com PdfSharp (compatível com .NET 8) -->
+    <PackageReference Include="PDFsharp" Version="6.1.1" />
+    <!-- Geração de QR Code -->
+    <PackageReference Include="QRCoder" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Ícone embutido no assembly -->
+    <Resource Include="Resources\app.ico"/>
+    <None Update="Resources\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
