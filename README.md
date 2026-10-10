@@ -8,7 +8,7 @@ A aplicação funciona **100% offline**, não depende de navegadores e foca em a
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 - **Abertura Rápida:** Suporte a arrastar e soltar (Drag & Drop) de arquivos XML diretamente na tela.
 - **Resumo Inteligente:** Exibe nome do cliente, valor total, data, chave de acesso e lista de produtos antes mesmo de gerar o PDF.
@@ -21,7 +21,7 @@ A aplicação funciona **100% offline**, não depende de navegadores e foca em a
 
 ---
 
-## 🚀 Como Compilar (Build)
+## Como Compilar (Build)
 
 O projeto está configurado para ser compilado como um **Executável Único (.exe)**, sem necessidade de instalação complexa.
 
@@ -43,7 +43,7 @@ O projeto está configurado para ser compilado como um **Executável Único (.ex
 
 ---
 
-## 🛠️ Arquitetura do Projeto
+## Arquitetura do Projeto
 
 O código foi estruturado em camadas para facilitar a manutenção e evolução:
 
@@ -61,7 +61,7 @@ O código foi estruturado em camadas para facilitar a manutenção e evolução:
 
 ---
 
-## 📦 Dependências (NuGet)
+## Dependências (NuGet)
 
 O projeto utiliza bibliotecas consolidadas e gratuitas:
 - **PdfSharp** (v6.1.1): Geração nativa de PDFs de alta performance.
@@ -69,9 +69,9 @@ O projeto utiliza bibliotecas consolidadas e gratuitas:
 
 ---
 
-## 🧪 Testando
+## Testando
 
 Na pasta `exemplos/`, há um arquivo `exemplo_nfce.xml` que você pode arrastar para dentro da aplicação para ver como ela funciona na prática.
 
 ---
-*Desenvolvido por Manus AI - 2025*
+*Desenvolvido por Bruno Leão - 2026*
